@@ -6,3 +6,4 @@ e <- 123
 .Rproj.user/
 git rm -r --cached .Rproj.user
 git commit -m "Stop tracking RStudio session files"
+ajsdnjiasdbnasjiod
