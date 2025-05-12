@@ -25,3 +25,5 @@ sgRNA_MaGeCK_df <- read_excel("Data/Translated_Big_data.xlsx")
 # Create table containing 
 dbWriteTable(mydb, "sgRNA_MaGeCK_data", sgRNA_MaGeCK_df)
 
+#Example query
+#dbGetQuery(mydb, "SELECT * from sgRNA_MaGeCK_data WHERE gene = 'TPX2'")
