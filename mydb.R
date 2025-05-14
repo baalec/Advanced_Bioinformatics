@@ -3,7 +3,7 @@ library("RSQLite")
 library("readxl")
 
 # Create and Connect Database using RSQLite and DBI
-#mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
+mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
 #Create table from DataFrame
 #dbWriteTable(mydb, "tableName", DataFrame)
 
