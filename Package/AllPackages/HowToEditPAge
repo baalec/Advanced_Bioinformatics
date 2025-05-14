@@ -1,0 +1,25 @@
+Open website by running:
+'pkgdown::build_site()'
+
+Website navigation and edit
+
+
+Edit AllPAckages homepage:
+Edit directly in the README.md file in package root directory
+
+Edit License:
+Navigate to the file 'DESCRIPTION' in root directory and edit directly udner license
+
+Edit Authors:
+Navigate into 'DESCRIPTION' and edit directly under:Authors@R
+
+Edit Citations:
+Navigate under 'CITATION' in root directory and change directly in that file
+
+Edit guide and example usage:
+Navigate /vignettes/Vignette_All_Fucntions
+Enter guide and example usage of all functions and/or Code
+
+
+
+
