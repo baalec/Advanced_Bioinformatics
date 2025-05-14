@@ -1,11 +1,14 @@
 Open website by running:
-'pkgdown::build_site()'
 
-Website navigation and edit
+library(pkgdown)
+pkgdown::build_site()
+
+
+Website navigation and edit:
 
 
 Edit AllPAckages homepage:
-Edit directly in the README.md file in package root directory
+Edit directly in the README.md file     in package root directory
 
 Edit License:
 Navigate to the file 'DESCRIPTION' in root directory and edit directly udner license
