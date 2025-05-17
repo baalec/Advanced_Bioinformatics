@@ -10,6 +10,7 @@ mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
 
 # Get data for model traning
 model_data <- dbGetQuery(mydb, "SELECT * FROM model_data")
+model_data <- model_data %>% filter(!is.na(gc_content))
 
 # Splitting the data
 set.seed(42)
@@ -76,3 +77,26 @@ print(importance_matrix)
 
 # Plot importance
 xgb.plot.importance(importance_matrix)
+
+# Investigate x_train contents
+summary(x_train)
+
+shap_values <- shap.values(xgb_model = model, X_train = x_train)
+shap_long <- shap.prep(shap_contrib = shap_values$shap_score, X_train = x_train)
+
+# Get top 20 features by mean absolute SHAP value
+top_features <- shap_long %>%
+  group_by(variable) %>%
+  summarise(mean_shap = mean(abs(rfvalue), na.rm = TRUE)) %>%
+  arrange(desc(mean_shap)) %>%
+  slice(1:20) %>%
+  pull(variable)
+
+# Filter and drop unused factor levels
+shap_long_top20 <- shap_long %>%
+  filter(variable %in% top_features)
+
+shap_long_top20$variable <- droplevels(shap_long_top20$variable)
+
+# Plot
+shap.plot.summary(shap_long_top20)
