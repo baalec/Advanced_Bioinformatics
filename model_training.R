@@ -34,13 +34,15 @@ y_val <- val_set$LFC
 x_test <- as.matrix(test_set %>% select(-"Index",-"LFC"))
 y_test <- test_set$LFC
 
-# Convert to DMatrix
+# Convert to DMatrix as xgboost requires a DMmatrix
+# It has to include data(features) and label(target)
 dtrain <- xgb.DMatrix(data = x_train, label = y_train)
 dval <- xgb.DMatrix(data = x_val, label = y_val)
 
 # Create watchlist for training + validation
 watchlist <- list(train = dtrain, eval = dval)
 
+# Set hyperparameters for model
 params <- list(
   eta = 0.1,
   max_depth = 4,
@@ -49,6 +51,8 @@ params <- list(
   eval_metric = "rmse"
 )
 
+# Train model using dtrain and params with watchlist to catch overfitting early
+# using early stopping
 model <- xgb.train(
   params = params,
   data = dtrain,
@@ -56,11 +60,13 @@ model <- xgb.train(
   early_stopping_rounds = 10,
   watchlist = watchlist,
   nthread = 4,
-  verbose = 1
+  verbose = 1,
+  maximize = FALSE
 )
 
 eval_log <- model$evaluation_log
 
+# Create plot for eval metric RMSE for both training and validation set
 plot(eval_log$iter, eval_log$train_rmse, type = "l", col = "blue",
      ylim = range(c(eval_log$train_rmse, eval_log$eval_rmse)),
      ylab = "RMSE", xlab = "Boosting Round", main = "Training vs Validation RMSE")
@@ -85,6 +91,7 @@ shap_values <- shap.values(xgb_model = model, X_train = x_train)
 shap_long <- shap.prep(shap_contrib = shap_values$shap_score, X_train = x_train)
 
 # Get top 20 features by mean absolute SHAP value
+# Can be used to simplify model by excluding the ones that do not contribute
 top_features <- shap_long %>%
   group_by(variable) %>%
   summarise(mean_shap = mean(abs(rfvalue), na.rm = TRUE)) %>%
