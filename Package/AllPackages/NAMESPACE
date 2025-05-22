@@ -2,4 +2,5 @@
 
 export(make_final_table)
 export(match_sgrna_to_exons)
+export(one_hot_encode)
 export(translate_sgrna)
