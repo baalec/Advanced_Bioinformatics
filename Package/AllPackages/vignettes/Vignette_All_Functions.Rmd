@@ -7,21 +7,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-```
-
-```{r setup}
+library(devtools)
+devtools::load_all(".")
 library(AllPackages)
-```
-
-```{r}
-#Example use
-#Here i use the function
-```
-
-
-

@@ -5,6 +5,9 @@
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/make_final_table.html</loc></url>
+<url><loc>/reference/match_sgrna_to_exons.html</loc></url>
 <url><loc>/reference/one_hot_encode.html</loc></url>
+<url><loc>/reference/translate_sgrna.html</loc></url>
 </urlset>
 
