@@ -1,6 +1,7 @@
 library("DBI")
 library("RSQLite")
 library("readxl")
+library(dbplyr)
 
 # Create and Connect Database using RSQLite and DBI
 mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
@@ -20,11 +21,51 @@ mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
 #dbRemoveTable(mydb, "tableName")
 
 # Read excel file into a dataframe
-sgRNA_MaGeCK_df <- read_excel("Data/Translated_Big_data.xlsx")
+sgRNA_MaGeCK_df <- read_excel("Data/sgrna_with_exons.xlsx")
 sgRNA_MaGeCK_df$index <- 1:nrow(sgRNA_MaGeCK_df) # Add Index rows
 
 # Create table containing 
-dbWriteTable(mydb, "sgRNA_MaGeCK_data", sgRNA_MaGeCK_df)
+dbWriteTable(mydb, "raw_data", sgRNA_MaGeCK_df)
 
 #Example query
 #dbGetQuery(mydb, "SELECT * from sgRNA_MaGeCK_data WHERE gene = 'TPX2'")
+# Connect and select sgRNA sequence, index, exon_position
+# and LFC score from dataset, save in df
+df <- dbGetQuery(mydb, "Select \"index\", sgrna, matched_exons, LFC FROM raw_data")
+df <- na.omit(df)
+
+# Create model_df for storing relevant data
+positions <- 20
+bases <- c("A","C","G","T")
+column_names <- as.vector(sapply(1:positions, function(i) paste0(bases, i)))
+column_names <- c("index", column_names, "gc_content","matched_exons", "absLFC")
+model_df <- data.frame(matrix(ncol = length(column_names),
+                              nrow = 0))
+colnames(model_df) <- column_names
+
+number_seq <- nrow(df)
+
+# Calculating gc content and one hot encoding sequences, taking the abs of LFC
+source("Package/TranslateSGRNA/R/one_hot_encode.R")
+for (i in 1:number_seq) {
+  sequence <- df[i, , drop = FALSE]
+  if (nrow(sequence) > 0) {
+    sgrna_seq <- sequence$sgrna
+    encoded <- one_hot_encode(sgrna_seq)
+    encoded <- as.vector(t(encoded))
+    
+    chars <- unlist(strsplit(sgrna_seq, ""))
+    base_counts <- table(factor(chars, levels = bases))
+    gc <- sum(base_counts[c("G","C")], na.rm = TRUE)
+    gc_content <- gc/positions
+    
+    row_df <- as.data.frame(t(c(i, encoded, gc_content, sequence$matched_exons,
+                                abs(sequence$LFC))), stringsAsFactors = FALSE)
+    colnames(row_df) <- column_names
+    row_df <- as.data.frame(lapply(row_df, as.numeric))
+    model_df <- rbind(model_df, row_df)
+  }              
+}             
+
+# Write model_data into database
+dbWriteTable(mydb, "model_data", model_df)

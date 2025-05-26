@@ -10,7 +10,8 @@ mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
 
 # Get data for model traning
 model_data <- dbGetQuery(mydb, "SELECT * FROM model_data")
-model_data <- model_data %>% filter(!is.na(gc_content))
+model_data <- na.omit(model_data)
+model_data <- model_data[model_data$matched_exons < 11,]
 
 # Splitting the data
 set.seed(42)
@@ -27,12 +28,12 @@ cat("Validation: ", nrow(val_set)/n_total, "\n")
 cat("Test: ", nrow(test_set)/n_total, "\n")
 
 # Split into x and y sets
-x_train <- as.matrix(train_set %>% select(-"Index",-"LFC"))
-y_train <- train_set$LFC
-x_val <- as.matrix(val_set %>% select(-"Index", -"LFC"))
-y_val <- val_set$LFC
-x_test <- as.matrix(test_set %>% select(-"Index",-"LFC"))
-y_test <- test_set$LFC
+x_train <- as.matrix(train_set %>% select(-"index",-"absLFC"))
+y_train <- train_set$absLFC
+x_val <- as.matrix(val_set %>% select(-"index", -"absLFC"))
+y_val <- val_set$absLFC
+x_test <- as.matrix(test_set %>% select(-"index",-"absLFC"))
+y_test <- test_set$absLFC
 
 # Convert to DMatrix as xgboost requires a DMmatrix
 # It has to include data(features) and label(target)
@@ -107,3 +108,5 @@ shap_long_top20$variable <- droplevels(shap_long_top20$variable)
 
 # Plot
 shap.plot.summary(shap_long_top20)
+
+dbDisconnect(mydb)
