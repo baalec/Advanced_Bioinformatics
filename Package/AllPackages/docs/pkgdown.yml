@@ -1,0 +1,9 @@
+pandoc: '3.4'
+pkgdown: 2.1.2
+pkgdown_sha: ~
+articles:
+  Vignette_All_Functions: Vignette_All_Functions.html
+last_built: 2025-05-22T13:06Z
+urls:
+  reference: /reference
+  article: /articles

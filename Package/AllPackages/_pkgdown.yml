@@ -1,0 +1,18 @@
+# _pkgdown.yml
+url: ""   # leave blank for local previews
+
+navbar:
+  structure:
+    - text: "Home"
+      href: index.html
+    - text: "Reference"
+      href: reference/index.html
+    - text: "Articles"
+      menu:
+        - text: "All Functions Guide"
+          href: articles/Vignette_All_Functions.html
+
+articles:
+  - title: "All Functions Guide"
+    contents:
+      - Vignette_All_Functions

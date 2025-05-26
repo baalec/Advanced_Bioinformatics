@@ -12,30 +12,28 @@
 #' @examples translate_sgrna(orig_path = "C:/Users/File_Location", libA_path"C:/Users/File_Location", libB_path"C:/Users/File_Location", out_path"C:/Users/File_Location"
 
 translate_sgrna <- function(orig_path, libA_path, libB_path, out_path) {
-  # Load libraries
-  library(readxl)   # read_excel()
-  library(dplyr)    # mutate()
-  library(writexl)  # write_xlsx()
+  library(readxl)  
+  library(dplyr)    
+  library(writexl)  
 
-  # 1. Read original data
+  #Read data
   orig_df <- read_excel(orig_path)
   head(orig_df)
 
-  # 2. Read translation tables
+  #Read translation tables
   HGLibA <- read.csv(libA_path, stringsAsFactors = FALSE)
   HGLibB <- read.csv(libB_path, stringsAsFactors = FALSE)
 
-  # 3. Build named vector lookup (UID -> seq)
+  #Build new vector with trasnlation: UID -> seq
   seq_map <- c(HGLibA$seq, HGLibB$seq)
   names(seq_map) <- c(HGLibA$UID,  HGLibB$UID)
 
-  # 4. Translate the `sgrna` column via vectorized lookup
+  #Translate the sgrna column via 'vectorized lookup'
+  #HERE IS THE ID CONVERSION BEING MADE THAT IS FASTER THAN MERGE/LOOP
   orig_df <- orig_df %>%
-    mutate(
-      sgrna = seq_map[as.character(sgrna)]
-    )
+    mutate(sgrna = seq_map[as.character(sgrna)])
 
-  # 5. Write the result to a new Excel file
+  #Write result to Excel file
   write_xlsx(orig_df, out_path)
 
   invisible(TRUE)

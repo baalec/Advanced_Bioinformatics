@@ -3,7 +3,7 @@ library("RSQLite")
 library("readxl")
 
 # Create and Connect Database using RSQLite and DBI
-#mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
+mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
 #Create table from DataFrame
 #dbWriteTable(mydb, "tableName", DataFrame)
 
@@ -26,3 +26,5 @@ sgRNA_MaGeCK_df$index <- 1:nrow(sgRNA_MaGeCK_df) # Add Index rows
 # Create table containing 
 dbWriteTable(mydb, "sgRNA_MaGeCK_data", sgRNA_MaGeCK_df)
 
+#Example query
+#dbGetQuery(mydb, "SELECT * from sgRNA_MaGeCK_data WHERE gene = 'TPX2'")
