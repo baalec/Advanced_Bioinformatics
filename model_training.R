@@ -110,3 +110,8 @@ shap_long_top20$variable <- droplevels(shap_long_top20$variable)
 shap.plot.summary(shap_long_top20)
 
 dbDisconnect(mydb)
+
+ggplot(model_data, aes(x = matched_exons, y = absLFC)) +
+  geom_jitter()
+anova(lm(absLFC~matched_exons,as.data.frame(model_data)))
+?lm
