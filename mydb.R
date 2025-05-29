@@ -20,8 +20,8 @@ mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
 #dbRemoveTable(mydb, "tableName")
 
 # Read excel file into a dataframe
-sgRNA_MaGeCK_df <- read_excel("Data/Translated_Big_data.xlsx")
-sgRNA_MaGeCK_df$index <- 1:nrow(sgRNA_MaGeCK_df) # Add Index rows
+sgRNA_MaGeCK_df <- read_excel("Data/sgrna_with_exons.xlsx")
+sgRNA_MaGeck_df$index <- 1:nrow(sgRNA_MaGeCK_df) # Add Index rows
 
 # Create table containing 
 dbWriteTable(mydb, "sgRNA_MaGeCK_data", sgRNA_MaGeCK_df)
