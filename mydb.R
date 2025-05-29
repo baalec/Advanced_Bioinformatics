@@ -2,7 +2,7 @@ library("DBI")
 library("RSQLite")
 library("readxl")
 library(dbplyr)
-devtools::install("./Package/AllPackages")
+#devtools::install("./Package/AllPackages")
 library(AllPackages)
 
 # Create and Connect Database using RSQLite and DBI
@@ -27,13 +27,14 @@ sgRNA_MaGeCK_df <- read_excel("Data/sgrna_with_exons.xlsx")
 sgRNA_MaGeCK_df$index <- 1:nrow(sgRNA_MaGeCK_df) # Add Index rows
 
 # Create table containing 
-dbWriteTable(mydb, "raw_data", sgRNA_MaGeCK_df)
+dbWriteTable(mydb, "raw_data", sgRNA_MaGeCK_df, overwrite = TRUE)
 
 #Example query
 #dbGetQuery(mydb, "SELECT * from sgRNA_MaGeCK_data WHERE gene = 'TPX2'")
 # Connect and select sgRNA sequence, index, exon_position
 # and LFC score from dataset, save in df
-df <- dbGetQuery(mydb, "Select \"index\", sgrna, matched_exons, avg_ctrl, LFC FROM raw_data")
+df <- dbGetQuery(mydb, "Select \"index\", sgrna, matched_exons AS Exon_position,
+                 avg_ctrl AS RNAseq_expression, LFC FROM raw_data")
 df <- na.omit(df)
 
 # Create model_df for storing relevant data
@@ -70,4 +71,4 @@ for (i in 1:number_seq) {
 }             
 
 # Write model_data into database
-dbWriteTable(mydb, "model_data", model_df)
+dbWriteTable(mydb, "model_data", model_df, overwrite = TRUE)
