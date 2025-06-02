@@ -1,0 +1,30 @@
+library("DBI")
+library("RSQLite")
+library("readxl")
+
+# Create and Connect Database using RSQLite and DBI
+mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
+#Create table from DataFrame
+#dbWriteTable(mydb, "tableName", DataFrame)
+
+# List tables in mydb
+#dbListTables(mydb)
+
+# Select top 5 entries in tableName
+#dbGetQuery(mydb, "Select * FROM tableName LIMIT 5")
+
+#Disconnect from Database
+#dbDisconnect(mydb)
+
+# Drop table from Database
+#dbRemoveTable(mydb, "tableName")
+
+# Read excel file into a dataframe
+sgRNA_MaGeCK_df <- read_excel("Data/sgrna_with_exons.xlsx")
+sgRNA_MaGeck_df$index <- 1:nrow(sgRNA_MaGeCK_df) # Add Index rows
+
+# Create table containing 
+dbWriteTable(mydb, "sgRNA_MaGeCK_data", sgRNA_MaGeCK_df)
+
+#Example query
+#dbGetQuery(mydb, "SELECT * from sgRNA_MaGeCK_data WHERE gene = 'TPX2'")

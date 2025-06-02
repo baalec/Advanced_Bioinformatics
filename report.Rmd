@@ -1,0 +1,46 @@
+---
+title: "Advanced Bioinformatics Report"
+author: "Emil Carlstedt, Alec Thomsen"
+date: "2025-05-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## Introduction
+The discovery of CRISPR-Cas 9 has lead to innumerable possibilities in the field of biotechnology. One of them involves the use of sgRNA engineered to target specific genes of interest in order to do knock-out experiments. Understanding how to design these sgRNAs is crucial to the experiments success. The guide lines for this is rather vague and could use improving.  
+To tackle this issue we will employ a tactic involving supervised machine learning. This will help us assess what features of a sgRNA are most important for its effectiveness.
+
+## Theory
+Additional Theory used to to analyze the data
+
+## Implementation
+1. Flowchart or overview of the solution; link to GitHub  
+2. Relevant Screenshots of the RShiny solution  
+3. Bonus material - additional tasks you added that you want to share with the others
+
+##Evaluation
+1. Did you manage to solve the problem?  
+2. Why/why not?

@@ -20,13 +20,34 @@ source("Package/TranslateSGRNA/R/one_hot_encode.R")
 #' for that sequence.
 #' This should result in the matrix needed for our model
 #' 
+
+# Create new table in database containing position and score
+positions <- 20
+bases <- c("A","C","G","T")
+column_names <- as.vector(sapply(1:positions, function(i) paste0(bases, i)))
+column_names <- c("Index", column_names, "gc_content", "LFC")
+model_df <- data.frame(matrix(ncol = length(column_names),
+                              nrow = 0))
+colnames(model_df) <- column_names
+dbWriteTable(mydb,"model_data", model_df)
+
 # Create empty dataframe
-df2 <- data.frame()
-for (sequence in df$sgrna) {
-  df2 <- rbind(df2, t(as.vector(one_hot_encode(sequence))))
+df <- data.frame()
+number_of_seq <- unlist(dbGetQuery(mydb, "SELECT COUNT(*) AS nr_seq
+                                   FROM sgRNA_MaGeCK_data"))
+for (i in 0:number_of_seq) {
+  query <- sprintf("SELECT sgrna, LFC 
+                         FROM sgRNA_MaGeCK_data 
+                         WHERE \"index\" = %d", i)
+  sequence <- dbGetQuery(mydb, query)
+  if (nrow(sequence) > 0) {
+    gc <- sum(table(strsplit(sequence$sgrna, ""))[c("C","G")])
+    gc_content <- gc/positions
+    encoded <- t(as.vector(one_hot_encode(sequence$sgrna)))
+    df <- as.data.frame(cbind(index = i, encoded,
+                              gc_content = gc_content,
+                              LFC = sequence$LFC))
+    colnames(df) <- column_names
+    dbWriteTable(mydb, "model_data", df, append = TRUE, row.names = FALSE)
+  }
 }
-
-df2 <- rbind(df2, t(as.vector(one_hot_encode(df$sgrna[1]))))
-df2 <- cbind(df2, df$LFC[1])
-df2 <-rbind(df2, t(as.vector(one_hot_encode(df$sgrna[2]))))
-
