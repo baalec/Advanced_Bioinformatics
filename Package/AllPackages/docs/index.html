@@ -61,16 +61,19 @@
 <div class="section level1">
 <div class="page-header"><h1 id="allpackages">AllPackages<a class="anchor" aria-label="anchor" href="#allpackages"></a>
 </h1></div>
-<p><strong>AllPackages</strong> is an R toolkit that lets you …</p>
-<ul>
-<li>🔍 Easily one-hot encode categorical variables</li>
-<li>🧰 Connect to your local SQLite DB with helper functions</li>
-<li>📊 Quickly generate summary reports</li>
-</ul>
+<p><strong>AllPackages</strong> is an R toolkit that has the following functions:</p>
+<p>🧬 One_hot_encode – Encodes a sequence into 1’s and 0’s (one-hot format).</p>
+<p>🔗 ConnectRNAseqandGenome – Summarizes three RNA-seq .gz files and joins them with the correct genes annotated from the human reference genome.</p>
+<p>🧠 sgRNAExonLocation – Aligns the last 10 bp of sgRNA sequences to the human reference genome to identify which exon each sgRNA specifically targets.</p>
+<p>🧾 TranslatesgRNAGeneNames – Takes an sgRNA .xlsx file and translates sgRNA IDs into sequences using two .csv translation files.</p>
+<p>🧪 FindOverLapUsage – Takes a random short RNA sequence and aligns it to a random chromosome in the human reference genome using the FindOverlap() function.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>```r</p>
+<ol style="list-style-type: decimal">
+<li><p>Install the following packages manually: dplyr, writexl, Biostrings, IRanges, GenomicRanges, readxl</p></li>
+<li><p>Run remote install command: remotes::install_local(“Advanced_Bioinformatics/AllPackages_0.0.0.9000.tar.gz”)</p></li>
+</ol>
 </div>
 </div>
   </div>
@@ -79,7 +82,8 @@
     <div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li>Here i will write a more detailed description of our license later skrrt xd</li>
+<li>License: <a href="https://opensource.org/licenses/mit-license.php">MIT</a>
+</li>
 </ul>
 </div>
 
@@ -95,6 +99,7 @@
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Alec Thomsen <br><small class="roles"> Author, maintainer </small>   </li>
+<li>Emil Carlstedt <br><small class="roles"> Author </small>   </li>
 </ul>
 </div>
 
@@ -106,7 +111,7 @@
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Alec Thomsen.</p>
+<p>Developed by Alec Thomsen, Emil Carlstedt.</p>
 </div>
 
 <div class="pkgdown">

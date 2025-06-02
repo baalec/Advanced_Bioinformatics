@@ -7,7 +7,7 @@ navbar:
       href: index.html
     - text: "Reference"
       href: reference/index.html
-    - text: "Articles"
+    - text: "Vignette"
       menu:
         - text: "All Functions Guide"
           href: articles/Vignette_All_Functions.html

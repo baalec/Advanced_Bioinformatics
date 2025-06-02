@@ -1,17 +1,12 @@
 ---
-title: "Vignette_All_Functions"
+title: "All Functions Demonstration"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette_All_Functions}
+  %\VignetteIndexEntry{All Functions Demonstration}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
+  
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-library(devtools)
-devtools::load_all(".")
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(AllPackages)

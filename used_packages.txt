@@ -1,0 +1,11 @@
+methods
+DBI
+RSQLite
+readxl
+xgboost
+shiny
+dplyr
+writexl
+Biostrings
+IRanges
+GenomicRanges

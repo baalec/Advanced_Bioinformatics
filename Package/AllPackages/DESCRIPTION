@@ -1,10 +1,11 @@
 Package: AllPackages
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
-Authors@R: 
-    person("Alec", "Thomsen", , "fraga981@hotmail.com", role = c("aut", "cre"))
+Authors@R: c(
+    person("Alec", "Thomsen", email = "fraga981@hotmail.com", role = c("aut", "cre")),
+    person("Emil", "Carlstedt", email = "emilcarlstedt@hotmail.com", role = c("aut")))
 Description: What the package does (one paragraph).
-License: Here i will write a more detailed description of our license later skrrt xd
+License: License: MIT
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2

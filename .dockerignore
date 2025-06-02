@@ -1,0 +1,17 @@
+*.Rproj.user
+*.Rhistory
+*.RData
+*.Ruserdata
+*.git
+*.gitignore
+*.DS_Store
+*.csv
+*.xlsx
+*.rds
+*.png
+*.jpg
+data/
+tmp/
+logs/
+*.db
+*.sqlite
