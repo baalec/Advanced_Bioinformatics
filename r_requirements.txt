@@ -1,0 +1,10 @@
+Biostrings,2.76.0
+DBI,1.2.3
+dplyr,1.1.4
+GenomicRanges,1.60.0
+IRanges,2.42.0
+readxl,1.4.5
+RSQLite,2.3.11
+shiny,1.10.0
+writexl,1.5.4
+xgboost,1.7.11.1

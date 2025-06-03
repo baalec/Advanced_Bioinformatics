@@ -9,12 +9,13 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' translate_sgrna(
 #'   orig_path = "path/to/original_sgrna_data.xlsx",
 #'   libA_path = "path/to/translation_library_A.csv",
 #'   libB_path = "path/to/translation_library_B.csv",
 #'   out_path = "path/to/output_translated_file.xlsx"
-#' )
+#' )}
 
 translate_sgrna <- function(orig_path, libA_path, libB_path, out_path) {
   library(readxl)

@@ -19,7 +19,8 @@ The discovery of CRISPR-Cas9 has led to innumerable possibilities in the field o
 To tackle this issue we will employ a tactic involving supervised machine learning. This will help us assess what features of a sgRNA are most important for its effectiveness.
 
 ## Theory
-Additional Theory used to to analyze the data
+The sgRNA dataset we chose to use was of the GeCKO v2 sgRNA library, and it was designed to give high-throughput genome wide knockout screening
+Therefore when using this data we assume that these sgRNA's reliably bind to their respective target binding site, and bind with high accuracy.
 
 ## Implementation
 1. Flowchart or overview of the solution; link to GitHub  
