@@ -1,10 +1,11 @@
 ---
 title: "Assessing feature importance for sgRNA using supervised machine learning"
-author: "Emil Carlstedt, Alec Thomsen"
+author: "Alec Thomsen, Emil Carlstedt"
 date: "2025-05-29"
-output: html_document
+output:
+  html_document: default
 bibliography: references.bib
-csl: harvard-limerick.csl
+csl: "harvard-limerick.csl"
 ---
 
 ```{r setup, include=FALSE}
@@ -32,8 +33,8 @@ The features of interest; nucleotide position, gc content, exon position, and RN
 An initial look at the distribution of the features was done using a box plot (See *Figure 1*). This identified a skewed distribution of the data, especially in the feature exon position.
 
 ```{r, echo = FALSE, fig.align='center', fig.width=10, fig.height=5, fig.cap = "Figure 1. Boxplots displaying the distribution of selected features (exon_position, gc_content, and RNAseq_expression). The plot to the left displays the data pre filtering and the one on the right after filtering. Looking specifically on the boxplot for exon_position we can see that there are a outliers that skews the data, this is adress by the removal of the outliers."}
-boxplot_pf <- readRDS("boxplot_pf")
-boxplot_af <- readRDS("boxplot_af")
+boxplot_pf <- readRDS("www/boxplot_pf")
+boxplot_af <- readRDS("www/boxplot_af")
 print(boxplot_pf + boxplot_af)
 ```
 
@@ -54,7 +55,7 @@ This resulted in a optimal boosting round of `r best_nrounds` which was implemen
 After the training SHAP values were calculated as seen in *Figure 2*. Here we can see that highly expressed genes are positively related to a large LFC value, these genes could possible be viewed as "householding" genes and have a vital part in the cell. Nucleotide position has unclear results for example position 20 where all nucleotides have a negative impact on the model which goes against previous studies saying that the later positions are more important.
 
 ```{r, echo = FALSE, fig.cap = "Figure 2. SHAP values for the final model. RNA-seq expression can be seen as the highest contributing feature to the models prediction. Higher RNA expression leads to higher LFC."}
-shap_plot <- readRDS("shap_final")
+shap_plot <- readRDS("www/shap_final")
 print(shap_plot)
 ```
 
@@ -70,8 +71,8 @@ kable(eval_df, caption = "Table 2. Evaluation Metrics for Final Model.") %>%
 This can also be seen when looking at the Prediction vs Actual plot and Predicted vs Residuals (See *Figure 3 and 4*). The model seems limited in its predictions to a range of 0.5 to 1.5 regardless of the actual value of the sequence. And the fanning pattern displayed in *Figure 4* indicates heteroscadescity in the models predictions as the error is increasing when the model tries to predict larger values.
 
 ```{r, echo = FALSE, fig.cap = "Figure 3 (left) displaying a pattern that the model can only predict values between 0.5 and 1.5 regardless of the actual value. Figure 4 (right) Displaying a fanning pattern, suggesting heteroscedascity."}
-predicted_vs_actual <- readRDS("predicted_vs_actual")
-predicted_vs_residuals <- readRDS("predicted_vs_residuals")
+predicted_vs_actual <- readRDS("www/predicted_vs_actual")
+predicted_vs_residuals <- readRDS("www/predicted_vs_residuals")
 print(predicted_vs_actual + predicted_vs_residuals)
 ```
 
@@ -85,8 +86,8 @@ Using LFC as a target might not have been the best choice as we would only get o
 ## Appendix
 Figure 1A
 ```{r, echo = FALSE}
-dist_lfc_pf <- readRDS("dist_lfc_pf")
-dist_lfc_af <- readRDS("dist_lfc_af")
+dist_lfc_pf <- readRDS("www/dist_lfc_pf")
+dist_lfc_af <- readRDS("www/dist_lfc_af")
 print(dist_lfc_pf + dist_lfc_af)
 ```
 
