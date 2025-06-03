@@ -1,6 +1,7 @@
 library(xgboost)
 library(DBI)
 library(dplyr)
+library(tidyr)
 library(RSQLite)
 library(ggplot2)
 library(SHAPforxgboost)
@@ -8,40 +9,77 @@ library(SHAPforxgboost)
 # Connect to database
 mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
 
-# Get data for model traning
+# Get data for model training data
 model_data <- dbGetQuery(mydb, "SELECT * FROM model_data")
+# Get distrubtion of LFC
+#dist_lfc_pf <-ggplot(data = model_data, mapping = aes(x = LFC)) +
+                geom_histogram() +
+                theme_minimal() +
+                labs(title = "Distribution of LFC")
+#print(dist_lfc_pf)
+
+# geom_boxplot()# Filter out extreme LFC values
+#model_data <- model_data[model_data$LFC < 2.5 & model_data$LFC > -2.5, ]
+# Filter out data with NA, Exon_position > 10, RNAseq < 11
 model_data <- na.omit(model_data)
-model_data <- model_data[model_data$matched_exons < 11,]
+# Take log of RNAseq to make it comparable in SHAP and remove those
+# with 1 or less to only get active genes
+model_data$RNAseq_expression <- log2(model_data$RNAseq_expression + 1)
+model_data <- model_data[model_data$RNAseq_expression > 1, ]
+
+# Make boxplots of exon_position, RNAseq_expression and gc_content
+features_for_boxplot <- model_data %>% 
+  select("Exon_position","RNAseq_expression", "gc_content") %>%
+  pivot_longer(cols = everything(), names_to = "Feature", values_to = "Value")
+
+boxplot_pf <- ggplot(data = features_for_boxplot, mapping = aes(x = "", y = Value)) +
+  geom_boxplot() +
+  theme_minimal() +
+  facet_wrap(~ Feature, scales = "free_y") +
+  labs(title = "Selected features pre filtering", x = "", y = "Value")
+print(boxplot_pf)
+saveRDS(boxplot_pf, "boxplot_pf")
+# Filter out outliers
+model_data <- model_data[model_data$Exon_position < 11,]
+model_data <- model_data[model_data$gc_content >= 0.25 
+                         & model_data$gc_content <= 0.8, ]
+
+features_for_boxplot <- model_data %>% 
+  select("Exon_position","RNAseq_expression", "gc_content") %>%
+  pivot_longer(cols = everything(), names_to = "Feature", values_to = "Value")
+
+boxplot_af <- ggplot(data = features_for_boxplot, mapping = aes(x = "", y = Value)) +
+  geom_boxplot() +
+  theme_minimal() +
+  facet_wrap(~ Feature, scales = "free_y") +
+  labs(title = "Selected Features after filtering", x = "", y = "Value")
+print(boxplot_af)
+saveRDS(boxplot_af, "boxplot_af")
+# Only take negative LFC as these are "vital gene knockouts"
+model_data <- model_data[model_data$LFC <= 0, ]
+# Take abs of LFC to make it for interpretation
+model_data$LFC <- abs(model_data$LFC)
 
 # Splitting the data
 set.seed(42)
 # Set asid 20% for test, for train 60% and validation 20%
-train_val <- model_data %>% dplyr::sample_frac(0.8)
-train_set <- train_val %>% dplyr::sample_frac(0.75)
-val_set <- dplyr::anti_join(train_val, train_set)
-test_set <- dplyr::anti_join(model_data,train_val)
+train_set <- model_data %>% dplyr::sample_frac(0.8)
+test_set <- dplyr::anti_join(model_data,train_set)
 
 # Confirm splitting is correct
 n_total <- nrow(model_data)
 cat("Train: ", nrow(train_set)/n_total, "\n")
-cat("Validation: ", nrow(val_set)/n_total, "\n")
 cat("Test: ", nrow(test_set)/n_total, "\n")
 
 # Split into x and y sets
-x_train <- as.matrix(train_set %>% select(-"index",-"absLFC"))
-y_train <- train_set$absLFC
-x_val <- as.matrix(val_set %>% select(-"index", -"absLFC"))
-y_val <- val_set$absLFC
-x_test <- as.matrix(test_set %>% select(-"index",-"absLFC"))
-y_test <- test_set$absLFC
+x_train <- as.matrix(train_set %>% select(-"index",-"LFC"))
+y_train <- train_set$LFC
+x_test <- as.matrix(test_set %>% select(-"index",-"LFC"))
+y_test <- test_set$LFC
 
 # Convert to DMatrix as xgboost requires a DMmatrix
 # It has to include data(features) and label(target)
 dtrain <- xgb.DMatrix(data = x_train, label = y_train)
-dval <- xgb.DMatrix(data = x_val, label = y_val)
-
-# Create watchlist for training + validation
-watchlist <- list(train = dtrain, eval = dval)
 
 # Set hyperparameters for model
 params <- list(
@@ -54,64 +92,99 @@ params <- list(
 
 # Train model using dtrain and params with watchlist to catch overfitting early
 # using early stopping
-model <- xgb.train(
+cv_results <- xgb.cv(
   params = params,
   data = dtrain,
   nrounds = 1000,
+  nfold = 5,
   early_stopping_rounds = 10,
-  watchlist = watchlist,
-  nthread = 4,
   verbose = 1,
-  maximize = FALSE
+  maximize = FALSE,
+  metrics = "rmse",
+  prediction = TRUE
 )
 
-eval_log <- model$evaluation_log
+best_nrounds <- cv_results$best_iteration
+cat("Best number of boosting rounds from CV:", best_nrounds, "\n")
 
-# Create plot for eval metric RMSE for both training and validation set
-plot(eval_log$iter, eval_log$train_rmse, type = "l", col = "blue",
-     ylim = range(c(eval_log$train_rmse, eval_log$eval_rmse)),
-     ylab = "RMSE", xlab = "Boosting Round", main = "Training vs Validation RMSE")
-lines(eval_log$iter, eval_log$eval_rmse, col = "red")
-legend("topright", legend = c("Train", "Validation"), col = c("blue", "red"), lty = 1)
+# FINAL MODEL
+final_model <- xgb.train(params = params,
+                         data = dtrain,
+                         nrounds = best_nrounds,
+                         verbose = 1)
 
-cat("Best iteration:", model$best_iteration, "\n")
+# Create SHAP values and plot top 20 features
+shap_values <- shap.values(xgb_model = final_model, X_train = x_train)
+shap_long <- shap.prep(xgb_model = final_model, X_train = x_train, top_n = 25)
+shap_final <- shap.plot.summary(data_long = shap_long)                         
+print(shap_final)
+saveRDS(shap_final, "shap_final")
 
-# Get feature importance matrix
-importance_matrix <- xgb.importance(model = model)
+# Predict on test set
+preds <- predict(final_model, newdata = x_test)
 
-# View importance
-print(importance_matrix)
+# Evaluation of model
+errors <- y_test - preds
+model_rmse <- sqrt(mean(errors^2))
+model_mae <- mean(abs(errors))
 
-# Plot importance
-xgb.plot.importance(importance_matrix)
+sst <- sum((y_test - mean(y_test))^2)
+sse <- sum(errors^2)
+model_r2 <- 1 - sse / sst
 
-# Investigate x_train contents
-summary(x_train)
+eval_df <- data.frame(model_rmse,model_mae,model_r2)
 
-shap_values <- shap.values(xgb_model = model, X_train = x_train)
-shap_long <- shap.prep(shap_contrib = shap_values$shap_score, X_train = x_train)
+cat("Test RMSE:", model_rmse, "\n")
+cat("Test MAE:", model_mae, "\n")
+cat("Test R2:", model_r2, "\n")
 
-# Get top 20 features by mean absolute SHAP value
-# Can be used to simplify model by excluding the ones that do not contribute
-top_features <- shap_long %>%
-  group_by(variable) %>%
-  summarise(mean_shap = mean(abs(rfvalue), na.rm = TRUE)) %>%
-  arrange(desc(mean_shap)) %>%
-  slice(1:20) %>%
-  pull(variable)
+# Predictions vs Actual
+pred_df <- data.frame(
+  Actual = y_test,
+  Predicted = preds
+)
 
-# Filter and drop unused factor levels
-shap_long_top20 <- shap_long %>%
-  filter(variable %in% top_features)
+predicted_vs_actual <-ggplot(pred_df, aes(x = Actual, y = Predicted)) +
+  geom_point(alpha = 0.6, color = "steelblue") +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
+  theme_minimal() +
+  labs(
+    title = "Predicted vs Actual Values (Test Set)",
+    x = "Actual LFC",
+    y = "Predicted LFC"
+  ) +
+  coord_equal() +
+  theme(plot.title = element_text(hjust = 0.5))
+print(predicted_vs_actual)
+saveRDS(predicted_vs_actual, "predicted_vs_actual")
+# Residuals of predictions
 
-shap_long_top20$variable <- droplevels(shap_long_top20$variable)
+residuals <- y_test - preds
+resid_df <- data.frame(
+  Predicted = preds,
+  Residuals = residuals
+)
 
-# Plot
-shap.plot.summary(shap_long_top20)
+predicted_vs_residuals <- ggplot(resid_df, aes(x = Predicted, y = Residuals)) +
+  geom_point(alpha = 0.6, color = "darkorange") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  theme_minimal() +
+  labs(
+    title = "Residuals vs Predicted Values",
+    x = "Predicted LFC",
+    y = "Residuals (Actual - Predicted)"
+  ) +
+  theme(plot.title = element_text(hjust = 0.5))
+print(predicted_vs_residuals)
+saveRDS(predicted_vs_residuals, "predicted_vs_residuals")
+
+#summary(model_data)
+
+save(final_model, params, best_nrounds, eval_df, file = "saved_vars.RData")
 
 dbDisconnect(mydb)
 
-ggplot(model_data, aes(x = matched_exons, y = absLFC)) +
-  geom_jitter()
-anova(lm(absLFC~matched_exons,as.data.frame(model_data)))
-?lm
+#ggplot(model_data, aes(x = matched_exons, y = absLFC)) +
+  #geom_jitter()
+#anova(lm(absLFC~matched_exons,as.data.frame(model_data)))
+#?lm
