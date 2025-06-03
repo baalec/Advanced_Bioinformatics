@@ -3,15 +3,21 @@ title: "Advanced Bioinformatics Report"
 author: "Emil Carlstedt, Alec Thomsen"
 date: "2025-05-29"
 output: html_document
+bibliography: references.bib
+csl: harvard-limerick.csl
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(patchwork)
+library(knitr)
+library(kableExtra)
+load("saved_vars.RData")
 ```
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.c1om>.
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
@@ -30,7 +36,7 @@ plot(pressure)
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 ## Introduction
-The discovery of CRISPR-Cas 9 has lead to innumerable possibilities in the field of biotechnology. One of them involves the use of sgRNA engineered to target specific genes of interest in order to do knock-out experiments. Understanding how to design these sgRNAs is crucial to the experiments success. The guide lines for this is rather vague and could use improving.  
+The discovery of CRISPR-Cas9 has led to innumerable possibilities in the field of biotechnology. One of them involves the use of single-guide RNA engineered to target specific genes of interest in order to do knock-out experiments. Understanding how to design these sgRNAs is crucial to the experiments success, therefore guide lines have been developed. Although the guidelines differ for different species they have been shown to be effective.[@schindele2020crispr] Our interest is to find out just which of the features are most important for the effeciency of the sgRNA.
 To tackle this issue we will employ a tactic involving supervised machine learning. This will help us assess what features of a sgRNA are most important for its effectiveness.
 
 ## Theory
@@ -39,8 +45,41 @@ Additional Theory used to to analyze the data
 ## Implementation
 1. Flowchart or overview of the solution; link to GitHub  
 2. Relevant Screenshots of the RShiny solution  
-3. Bonus material - additional tasks you added that you want to share with the others
+3. Bonus material - additional tasks you added that you want to share with the others  
 
-##Evaluation
+### Pre-Processing
+The features of interest; nucleotide position, gc content, exon position, and RNA sequencing expression were exctracted from the database. NA values were omitted and RNA-seq expression was log2 transformed for easier interpritation. Only the sgRNA with RNA-seq expression above 1 were kept as they interpreted as activly transcribed genes.
+An initial look at the distribution of the features was done using a boxplot (See *Figure 1*). This identified a skewed distribution of the data, especially in the feature exon position.
+
+```{r, echo = FALSE, fig.align='center', fig.width=10, fig.height=5, fig.cap = "Figure 1. Boxplots displaying the distribution of selected features (exon_position, gc_content, and RNAseq_expression). The plot to the left displays the data pre filtering and the one on the right after filtering. Looking specifically on the boxplot for exon_position we can see that there are a outliers that skews the data, this is adress by the removal of the outliers."}
+boxplot_pf <- readRDS("boxplot_pf")
+boxplot_af <- readRDS("boxplot_af")
+print(boxplot_pf + boxplot_af)
+```
+
+We then filtered the data, only keeping those with a negative LFC. We then used the absolute value of the LFC as our dependent variable for the model.  
+The data was split into training and test sets using a 80/20 split. Using the hyper parameters seen in *Table 1*, the model underwent a 5-fold cross-validation, for 1000 rounds with early stopping after 10, in order to find the best boosting round.  
+
+```{r, echo = FALSE}
+param_df <- data.frame(Parameter = names(params), Value = unlist(params), row.names = NULL)
+
+kable(param_df, caption = "Table 1. Model Parameters") %>%
+  kable_styling(full_width = FALSE, position = "left") %>%
+  column_spec(1, width = "4cm") %>%
+  column_spec(2, width = "4cm")    
+
+```
+  
+This resulted in a optimal boosting round of `r best_nrounds` which was implemented when training the model on the training data.  
+After the training SHAP values were calculated as seen in *Figure 2*. 
+
+```{r, echo = FALSE, fig.cap = "Figure 2. SHAP values for the final model. RNA-seq expression can be seen as the highest contributing feature to the models prediction. Higher RNA expression leads to higher LFC."}
+shap_plot <- readRDS("shap_final")
+print(shap_plot)
+```
+
+## Evaluation
 1. Did you manage to solve the problem?  
-2. Why/why not?
+2. Why/why not?  
+
+## References
