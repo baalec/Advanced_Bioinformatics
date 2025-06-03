@@ -12,6 +12,9 @@ knitr::opts_chunk$set(echo = TRUE)
 library(patchwork)
 library(knitr)
 library(kableExtra)
+library(DBI)
+library(RSQLite)
+mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
 load("saved_vars.RData")
 ```
 ## Introduction
@@ -25,15 +28,42 @@ Therefore when using this data we assume that these sgRNA's reliably bind to the
 ## Implementation
 1. Flowchart or overview of the solution; link to GitHub  
 2. Relevant Screenshots of the RShiny solution  
-3. Bonus material - additional tasks you added that you want to share with the others  
+3. Bonus material - additional tasks you added that you want to share with the others 
+
+### Data Collection
+For this project, we decided to use four large datasets to determine the efficiency of the sgRNAs. First, we needed the sgRNA file with the library count and dropout count, which is used to calculate the LFC. Since our plan was to later use the LFC as a major guideline in model prediction, this dataset is the core of the model.
+
+Next, we integrated a translation file that converted the sgRNA IDs from the sgRNA file into their respective 20bp-long sequences, since this sequence will be the model input from which the LFC is predicted.
+
+Furthermore, we wanted to add another parameter to our model: the number of the exon to which a sgRNA was bound. The reasoning was that the later the exon it binds to, the more likely it is to result in an unsuccessful knockout. We hoped to find a correlation there. To do this, we used our translated sgRNA file along with a Human Annotation Reference Genome file, which provided exon numbers, exon start and end positions, and the entire human sequence. Using this information, a sequence alignment was performed to trace each sgRNA to its exact exon. Below is pseudocode explaining this exon extraction procedure:
+
+```#r
+LOAD libraries and files.
+JOIN sgRNA_file with Gene annotation file ON matched genes. (Pick one random splicing variant)
+EXTRACT last 12 bp's of each sgRNA
+
+For each sgRNA:
+
+GET gene region intervall
+EXTRACT sequence of that region (From correct chromosome)
+ALIGN sgRNA seq with sequence
+MATCH alignment position to find exon number
+STORE exon number In new row
+
+```
+Lastly, we took three control samples from another study that performed RNA-seq of the entire transcriptome of a cell in normal conditions for all genes, averaged their expression, and matched it to the corresponding gene. The final table that was used for data preprocessing looks as follows:
+
+```{r}
+head(dbGetQuery(mydb, "SELECT * FROM raw_data LIMIT 4"))
+```
 
 ### Pre-Processing
 The features of interest; nucleotide position, gc content, exon position, and RNA sequencing expression were extracted from the database. NA values were omitted and RNA-seq expression was log2 transformed for easier interpretation. Only the sgRNA with RNA-seq expression above 1 were kept as they interpreted as actively transcribed genes.
 An initial look at the distribution of the features was done using a box plot (See *Figure 1*). This identified a skewed distribution of the data, especially in the feature exon position.
 
 ```{r, echo = FALSE, fig.align='center', fig.width=10, fig.height=5, fig.cap = "Figure 1. Boxplots displaying the distribution of selected features (exon_position, gc_content, and RNAseq_expression). The plot to the left displays the data pre filtering and the one on the right after filtering. Looking specifically on the boxplot for exon_position we can see that there are a outliers that skews the data, this is adress by the removal of the outliers."}
-boxplot_pf <- readRDS("boxplot_pf")
-boxplot_af <- readRDS("boxplot_af")
+boxplot_pf <- readRDS("www/boxplot_pf")
+boxplot_af <- readRDS("www/boxplot_af")
 print(boxplot_pf + boxplot_af)
 ```
 
@@ -54,7 +84,7 @@ This resulted in a optimal boosting round of `r best_nrounds` which was implemen
 After the training SHAP values were calculated as seen in *Figure 2*. Here we can see that highly expressed genes are positively related to a large LFC value, these genes could possible be viewed as "householding" genes and have a vital part in the cell. Nucleotide position has unclear results for example position 20 where all nucleotides have a negative impact on the model which goes against previous studies saying that the later positions are more important.
 
 ```{r, echo = FALSE, fig.cap = "Figure 2. SHAP values for the final model. RNA-seq expression can be seen as the highest contributing feature to the models prediction. Higher RNA expression leads to higher LFC."}
-shap_plot <- readRDS("shap_final")
+shap_plot <- readRDS("www/shap_final")
 print(shap_plot)
 ```
 
@@ -70,8 +100,8 @@ kable(eval_df, caption = "Table 2. Evaluation Metrics for Final Model.") %>%
 This can also be seen when looking at the Prediction vs Actual plot and Predicted vs Residuals (See *Figure 3 and 4*). The model seems limited in its predictions to a range of 0.5 to 1.5 regardless of the actual value of the sequence. And the fanning pattern displayed in *Figure 4* indicates heteroscadescity in the models predictions as the error is increasing when the model tries to predict larger values.
 
 ```{r, echo = FALSE, fig.cap = "Figure 3 (left) displaying a pattern that the model can only predict values between 0.5 and 1.5 regardless of the actual value. Figure 4 (right) Displaying a fanning pattern, suggesting heteroscedascity."}
-predicted_vs_actual <- readRDS("predicted_vs_actual")
-predicted_vs_residuals <- readRDS("predicted_vs_residuals")
+predicted_vs_actual <- readRDS("www/predicted_vs_actual")
+predicted_vs_residuals <- readRDS("www/predicted_vs_residuals")
 print(predicted_vs_actual + predicted_vs_residuals)
 ```
 
@@ -85,8 +115,8 @@ Using LFC as a target might not have been the best choice as we would only get o
 ## Appendix
 Figure 1A
 ```{r, echo = FALSE}
-dist_lfc_pf <- readRDS("dist_lfc_pf")
-dist_lfc_af <- readRDS("dist_lfc_af")
+dist_lfc_pf <- readRDS("www/dist_lfc_pf")
+dist_lfc_af <- readRDS("www/dist_lfc_af")
 print(dist_lfc_pf + dist_lfc_af)
 ```
 
