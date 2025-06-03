@@ -4,11 +4,11 @@ library(shiny)
 ui <- fluidPage(
   titlePanel("SHAP & Training Data Viewer"),
   tabsetPanel(
-    tabPanel("shap plot summary",
+    tabPanel("Model",
              sidebarLayout(
                sidebarPanel(
-                 selectInput("shap_plot_choice", "Choose a SHAP plot:",
-                             choices = c("Boxplot After/before filtering",
+                 selectInput("shap_plot_choice", "Choose a plot:",
+                             choices = c("Boxplot of Data after/before filtering",
                                          "Shap",
                                          "Model prediction"))
                ),
@@ -39,12 +39,13 @@ ui <- fluidPage(
                   ")),
                  div(
                    actionButton("btn_lfc", "LFC", class = "circle-btn"),
+                   actionButton("btn_exons", "Exons", class = "circle-btn"),
                    actionButton("btn_rna", "RNA-expression", class = "circle-btn"),
                    actionButton("btn_gc", "gc-content", class = "circle-btn")
                  )
                ),
                mainPanel(
-                 uiOutput("training_image")
+                 uiOutput("training_rds_output")
                )
              )
     )
@@ -71,7 +72,7 @@ server <- function(input, output, session) {
     )
   })
   
-  # Render RDS plots in UI
+  # Render RDS plots in shap tab UI
   output$shap_rds_output <- renderUI({
     req(shap_rds_plots())
     
@@ -83,7 +84,7 @@ server <- function(input, output, session) {
     do.call(tagList, plot_output_list)
   })
   
-  # Render each plot
+  # Render each plot in shap tab
   observe({
     plots <- shap_rds_plots()
     for (i in seq_along(plots)) {
@@ -96,22 +97,57 @@ server <- function(input, output, session) {
     }
   })
   
-  # ---- Training Images Logic (remains unchanged except styling) ----
-  get_training_plot_path <- function(param_name) {
-    paste0("www/training_", param_name, ".png")
-  }
+  # --- Training Data tab: reactive to hold list of plots based on button clicked ---
+  training_rds_plots <- reactiveVal(NULL)
   
-  training_choice <- reactiveVal(NULL)
-  observeEvent(input$btn_lfc, { training_choice("lfc") })
-  observeEvent(input$btn_rna, { training_choice("rna_expression") })
-  observeEvent(input$btn_gc, { training_choice("gc_content") })
+  observeEvent(input$btn_lfc, {
+    training_rds_plots(list(
+      readRDS("www/dist_lfc_af"),
+      readRDS("www/dist_lfc_pf")
+    ))
+  })
+  observeEvent(input$btn_exons, {
+    training_rds_plots(list(
+      readRDS("www/exons_plot")
+    ))
+  })
+  observeEvent(input$btn_rna, {
+    training_rds_plots(list(
+      readRDS("www/rna_expression_histogram")
+    ))
+  })
+  observeEvent(input$btn_gc, {
+    training_rds_plots(list(
+      readRDS("www/gc_content_histogram")
+    ))
+  })
   
-  output$training_image <- renderUI({
-    req(training_choice())
-    img_src <- get_training_plot_path(training_choice())
-    tags$img(src = img_src, width = "600px")
+  # Render training plots UI
+  output$training_rds_output <- renderUI({
+    req(training_rds_plots())
+    
+    plot_output_list <- lapply(seq_along(training_rds_plots()), function(i) {
+      plotname <- paste0("trainingplot", i)
+      plotOutput(plotname)
+    })
+    
+    do.call(tagList, plot_output_list)
+  })
+  
+  # Render each training plot
+  observe({
+    plots <- training_rds_plots()
+    req(plots)
+    for (i in seq_along(plots)) {
+      local({
+        ii <- i
+        output[[paste0("trainingplot", ii)]] <- renderPlot({
+          plots[[ii]]
+        })
+      })
+    }
   })
 }
 
-# Run the app
 shinyApp(ui, server)
+
