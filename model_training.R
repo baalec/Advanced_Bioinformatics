@@ -12,14 +12,15 @@ mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
 # Get data for model training data
 model_data <- dbGetQuery(mydb, "SELECT * FROM model_data")
 # Get distrubtion of LFC
-#dist_lfc_pf <-ggplot(data = model_data, mapping = aes(x = LFC)) +
+dist_lfc_pf <-ggplot(data = model_data, mapping = aes(x = LFC)) +
                 geom_histogram() +
                 theme_minimal() +
-                labs(title = "Distribution of LFC")
-#print(dist_lfc_pf)
-
+                labs(title = "Distribution of LFC pre filtering")
+print(dist_lfc_pf)
+saveRDS(dist_lfc_pf, "dist_lfc_pf")
 # geom_boxplot()# Filter out extreme LFC values
 #model_data <- model_data[model_data$LFC < 2.5 & model_data$LFC > -2.5, ]
+
 # Filter out data with NA, Exon_position > 10, RNAseq < 11
 model_data <- na.omit(model_data)
 # Take log of RNAseq to make it comparable in SHAP and remove those
@@ -59,6 +60,14 @@ saveRDS(boxplot_af, "boxplot_af")
 model_data <- model_data[model_data$LFC <= 0, ]
 # Take abs of LFC to make it for interpretation
 model_data$LFC <- abs(model_data$LFC)
+
+# Get distrubtion of LFC
+dist_lfc_pf <-ggplot(data = model_data, mapping = aes(x = LFC)) +
+  geom_histogram() +
+  theme_minimal() +
+  labs(title = "Distribution of LFC after filtering")
+print(dist_lfc_pf)
+saveRDS(dist_lfc_pf, "dist_lfc_af")
 
 # Splitting the data
 set.seed(42)
