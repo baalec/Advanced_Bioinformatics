@@ -1,10 +1,11 @@
 ---
 title: "Assessing feature importance for sgRNA using supervised machine learning"
-author: "Emil Carlstedt, Alec Thomsen"
+author: "Alec Thomsen, Emil Carlstedt"
 date: "2025-05-29"
-output: html_document
+output:
+  html_document: default
 bibliography: references.bib
-csl: harvard-limerick.csl
+csl: "harvard-limerick.csl"
 ---
 
 ```{r setup, include=FALSE}

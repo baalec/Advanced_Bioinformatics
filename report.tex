@@ -37,46 +37,6 @@
 \makeatother
 \usepackage{xcolor}
 \usepackage[margin=1in]{geometry}
-\usepackage{color}
-\usepackage{fancyvrb}
-\newcommand{\VerbBar}{|}
-\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-% Add ',fontsize=\small' for more characters per line
-\usepackage{framed}
-\definecolor{shadecolor}{RGB}{248,248,248}
-\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
-\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\BuiltInTok}[1]{#1}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
-\newcommand{\ExtensionTok}[1]{#1}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\ImportTok}[1]{#1}
-\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\NormalTok}[1]{#1}
-\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\RegionMarkerTok}[1]{#1}
-\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
-\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 \usepackage{graphicx}
 \makeatletter
 \newsavebox\pandoc@box
@@ -129,56 +89,36 @@
 \newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
 \newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
 \newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same}
 \hypersetup{
-  pdftitle={Advanced Bioinformatics Report},
-  pdfauthor={Emil Carlstedt, Alec Thomsen},
+  pdftitle={Assessing feature importance for sgRNA using supervised machine learning},
+  pdfauthor={Alec Thomsen, Emil Carlstedt},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 
-\title{Advanced Bioinformatics Report}
-\author{Emil Carlstedt, Alec Thomsen}
+\title{Assessing feature importance for sgRNA using supervised machine
+learning}
+\author{Alec Thomsen, Emil Carlstedt}
 \date{2025-05-29}
 
 \begin{document}
 \maketitle
-
-\subsection{R Markdown}\label{r-markdown}
-
-This is an R Markdown document. Markdown is a simple formatting syntax
-for authoring HTML, PDF, and MS Word documents. For more details on
-using R Markdown see \url{http://rmarkdown.rstudio.com}.
-
-When you click the \textbf{Knit} button a document will be generated
-that includes both content as well as the output of any embedded R code
-chunks within the document. You can embed an R code chunk like this:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{summary}\NormalTok{(cars)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##      speed           dist       
-##  Min.   : 4.0   Min.   :  2.00  
-##  1st Qu.:12.0   1st Qu.: 26.00  
-##  Median :15.0   Median : 36.00  
-##  Mean   :15.4   Mean   : 42.98  
-##  3rd Qu.:19.0   3rd Qu.: 56.00  
-##  Max.   :25.0   Max.   :120.00
-\end{verbatim}
-
-\subsection{Including Plots}\label{including-plots}
-
-You can also embed plots, for example:
-
-\pandocbounded{\includegraphics[keepaspectratio]{report_files/figure-latex/pressure-1.pdf}}
-
-Note that the \texttt{echo\ =\ FALSE} parameter was added to the code
-chunk to prevent printing of the R code that generated the plot.
 
 \subsection{Introduction}\label{introduction}
 
@@ -189,14 +129,18 @@ experiments. Understanding how to design these sgRNAs is crucial to the
 experiments success, therefore guide lines have been developed. Although
 the guidelines differ for different species they have been shown to be
 effective.(Schindele \emph{et al.} 2020) Our interest is to find out
-just which of the features are most important for the effeciency of the
+just which of the features are most important for the efficiency of the
 sgRNA. To tackle this issue we will employ a tactic involving supervised
 machine learning. This will help us assess what features of a sgRNA are
 most important for its effectiveness.
 
 \subsection{Theory}\label{theory}
 
-Additional Theory used to to analyze the data
+The sgRNA dataset we chose to use was of the GeCKO v2 sgRNA library, and
+it was designed to give high-throughput genome wide knockout screening
+Therefore when using this data we assume that these sgRNA's reliably
+bind to their respective target binding site, and bind with high
+accuracy.
 
 \subsection{Implementation}\label{implementation}
 
@@ -215,25 +159,125 @@ Additional Theory used to to analyze the data
 \subsubsection{Pre-Processing}\label{pre-processing}
 
 The features of interest; nucleotide position, gc content, exon
-position, and RNA sequencing expression were exctracted from the
+position, and RNA sequencing expression were extracted from the
 database. NA values were omitted and RNA-seq expression was log2
-transformed for easier interpritation. An initial look at the
-distribution of the features was done using a boxplot (See figure 1).
-This identified a skewed distribution of the data, especially in the
-features exon position and gc content
+transformed for easier interpretation. Only the sgRNA with RNA-seq
+expression above 1 were kept as they interpreted as actively transcribed
+genes. An initial look at the distribution of the features was done
+using a box plot (See \emph{Figure 1}). This identified a skewed
+distribution of the data, especially in the feature exon position.
 
-\begin{center}\includegraphics{report_files/figure-latex/unnamed-chunk-1-1} \end{center}
+\begin{figure}
+
+{\centering \includegraphics{report_files/figure-latex/unnamed-chunk-1-1} 
+
+}
+
+\caption{Figure 1. Boxplots displaying the distribution of selected features (exon_position, gc_content, and RNAseq_expression). The plot to the left displays the data pre filtering and the one on the right after filtering. Looking specifically on the boxplot for exon_position we can see that there are a outliers that skews the data, this is adress by the removal of the outliers.}\label{fig:unnamed-chunk-1}
+\end{figure}
+
+We then filtered the data, only keeping those with a negative LFC. We
+then used the absolute value of the LFC as our dependent variable for
+the model.\\
+The data was split into training and test sets using a 80/20 split.
+Using the hyper parameters seen in \emph{Table 1}, the model underwent a
+5-fold cross-validation, for 1000 rounds with early stopping after 10,
+in order to find the best boosting round.
+
+\begin{longtable}[l]{>{\raggedright\arraybackslash}p{4cm}>{\raggedright\arraybackslash}p{4cm}}
+\caption{\label{tab:unnamed-chunk-2}Table 1. Model Parameters}\\
+\toprule
+Parameter & Value\\
+\midrule
+eta & 0.1\\
+max\_depth & 4\\
+gamma & 1\\
+objective & reg:squarederror\\
+eval\_metric & rmse\\
+\bottomrule
+\end{longtable}
+
+This resulted in a optimal boosting round of 115 which was implemented
+when training the model on the training data.\\
+After the training SHAP values were calculated as seen in \emph{Figure
+2}. Here we can see that highly expressed genes are positively related
+to a large LFC value, these genes could possible be viewed as
+``householding'' genes and have a vital part in the cell. Nucleotide
+position has unclear results for example position 20 where all
+nucleotides have a negative impact on the model which goes against
+previous studies saying that the later positions are more important.
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{report_files/figure-latex/unnamed-chunk-3-1.pdf}}
+\caption{Figure 2. SHAP values for the final model. RNA-seq expression
+can be seen as the highest contributing feature to the models
+prediction. Higher RNA expression leads to higher LFC.}
+\end{figure}
+
+After training the model was used to predict the LFC on the testing data
+that was withheld from training. The RMSE and MAE were not that large
+but the R2 was very low, meaning the model can make semi accurate
+predictions but is unable to explain the variance in the data.(See
+\emph{Table 2}).
+
+\begin{longtable}[l]{>{\raggedleft\arraybackslash}p{6cm}>{\raggedleft\arraybackslash}p{4cm}r}
+\caption{\label{tab:unnamed-chunk-4}Table 2. Evaluation Metrics for Final Model.}\\
+\toprule
+model\_rmse & model\_mae & model\_r2\\
+\midrule
+1.123658 & 0.7823011 & 0.1005288\\
+\bottomrule
+\end{longtable}
+
+This can also be seen when looking at the Prediction vs Actual plot and
+Predicted vs Residuals (See \emph{Figure 3 and 4}). The model seems
+limited in its predictions to a range of 0.5 to 1.5 regardless of the
+actual value of the sequence. And the fanning pattern displayed in
+\emph{Figure 4} indicates heteroscadescity in the models predictions as
+the error is increasing when the model tries to predict larger values.
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{report_files/figure-latex/unnamed-chunk-5-1.pdf}}
+\caption{Figure 3 (left) displaying a pattern that the model can only
+predict values between 0.5 and 1.5 regardless of the actual value.
+Figure 4 (right) Displaying a fanning pattern, suggesting
+heteroscedascity.}
+\end{figure}
 
 \subsection{Evaluation}\label{evaluation}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  Did you manage to solve the problem?\\
-\item
-  Why/why not?
-\end{enumerate}
+Our model is unable to find a pattern in the data we trained it on and
+therefore the SHAP values are not trustworthy. No conclusions towards
+our original goal can be drawn based on our results.\\
+This is most likely to the lack of larger scores in the data as seen in
+distribution of LFC(See Figure 1A in appendix).\\
+Testing different models and different targets could also be an option
+for further testing if more time was available. Using LFC as a target
+might not have been the best choice as we would only get on successful
+knock outs that targeted a vital gene. We tried to work around this by
+filtering out LFCs that were not of interest but this also means that we
+loose a lot of data. Using transcriptomic data for creating a
+classification on successful knock outs would result in minimum loss of
+data as even non vital genes would be included. Of course there are
+other difficulties with that approach. Would you use a binary approach
+saying that if its below a baseline with a certain amount its regarded a
+knock out or do you create different levels of success based on how much
+the transcription is reduced. And how do you decide on these limits? A
+lot of questions arise once you start digging into this subject and if
+time allows we would like to explore them all.
+
+\subsection{Appendix}\label{appendix}
+
+Figure 1A
+
+\begin{verbatim}
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{report_files/figure-latex/unnamed-chunk-6-1.pdf}}
 
 \subsection*{References}\label{references}
 \addcontentsline{toc}{subsection}{References}
