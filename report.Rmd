@@ -113,6 +113,32 @@ This is most likely to the lack of larger scores in the data as seen in distribu
 Testing different models and different targets could also be an option for further testing if more time was available.
 Using LFC as a target might not have been the best choice as we would only get on successful knock outs that targeted a vital gene. We tried to work around this by filtering out LFCs that were not of interest but this also means that we loose a lot of data. Using transcriptomic data for creating a classification on successful knock outs would result in minimum loss of data as even non vital genes would be included. Of course there are other difficulties with that approach. Would you use a binary approach saying that if its below a baseline with a certain amount its regarded a knock out or do you create different levels of success based on how much the transcription is reduced. And how do you decide on these limits? A lot of questions arise once you start digging into this subject and if time allows we would like to explore them all.
 
+Furthermore we did an ANOVA test that looked like this:
+```r
+# Does Exon_position explain absLFC?
+anova(lm(absLFC ~ Exon_position, data = model_data))
+
+Response: absLFC
+                 Df Sum Sq Mean Sq F value Pr(>F)
+Exon_position     1      1  1.1346  0.8162 0.3663
+Residuals     31634  43977  1.3902               
+
+
+
+# Does gc_content explain absLFC?
+anova(lm(absLFC ~ gc_content, data = model_data))
+Analysis of Variance Table
+
+Response: absLFC
+              Df Sum Sq Mean Sq F value    Pr(>F)    
+gc_content     1    113 112.897  81.416 < 2.2e-16 ***
+Residuals  31634  43866   1.387                      
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+```
+Here, GC content yields a highly significant p‐value (p < 2.2e-16), but note that it explains only a very small fraction of the total variance (around 0.26%). In conclusion although the relationship is statistically significant, the effect size is practically negligible.
+
 ## Appendix
 Figure 1A
 ```{r, echo = FALSE}

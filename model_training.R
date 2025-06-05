@@ -193,6 +193,13 @@ save(final_model, params, best_nrounds, eval_df, file = "saved_vars.RData")
 
 dbDisconnect(mydb)
 
+
+#ANVAS being amde
+anova(lm(absLFC ~ Exon_position, data = model_data))
+
+
+anova(lm(absLFC ~ gc_content, data = model_data))
+
 #ggplot(model_data, aes(x = matched_exons, y = absLFC)) +
   #geom_jitter()
 #anova(lm(absLFC~matched_exons,as.data.frame(model_data)))
